@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Sales Dashboard</title>
+
+  <style>
+    :root{
+      --bg:#f4f9fb;
+      --card:#ffffff;
+      --blue:#0ea5e9;
+      --blue2:#0369a1;
+      --green:#22c55e;
+      --green2:#166534;
+      --line:#e5e7eb;
+      --muted:#64748b;
+      --head:#e0f2fe;
+      --hover:#f0fdf4;
+      --shadow:0 8px 22px rgba(0,0,0,.06);
+    }
+
+    body{margin:0;font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:#1f2d3d;}
+
+    header{
+      background:linear-gradient(90deg,var(--blue),var(--green));
+      color:#fff;padding:18px 16px;text-align:center;
+      font-size:22px;font-weight:900;box-shadow:0 4px 10px rgba(0,0,0,.10)
+    }
+
+    .container{padding:18px;max-width:1400px;margin:auto;}
+
+    .topbar{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      margin-bottom:14px;
+    }
+
+    .search-box{
+      flex:1 1 420px;
+      padding:12px 14px;border-radius:14px;border:1px solid #cbd5e1;
+      font-size:16px;outline:none;background:#fff;
+    }
+
+    .chips{display:flex;gap:8px;flex-wrap:wrap;}
+    .chip{
+      background:#fff;border:1px solid #cbd5e1;color:var(--blue2);
+      padding:8px 10px;border-radius:999px;font-size:13px;font-weight:900;
+      text-decoration:none;
+    }
+    .chip:hover{background:var(--hover);}
+
+    .note{
+      background:rgba(14,165,233,.10);
+      border:1px solid rgba(14,165,233,.25);
+      color:#0b4a6e;
+      padding:10px 12px;border-radius:14px;
+      margin:12px 0 18px 0;
+      font-size:13px;line-height:1.7;
+    }
+
+    .section{margin:24px 0 36px 0;}
+    .section-title{font-size:20px;margin:0 0 12px 0;color:var(--blue);font-weight:900;display:flex;gap:10px;align-items:center;}
+    .section-title small{color:var(--muted);font-weight:800;}
+
+    table{
+      width:100%;border-collapse:collapse;background:var(--card);
+      border-radius:18px;overflow:hidden;box-shadow:var(--shadow)
+    }
+
+    th,td{padding:12px 12px;text-align:right;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top;line-height:1.75;}
+    th{background:var(--head);color:var(--blue2);font-weight:900;font-size:13px;}
+    tr:hover{background:var(--hover);}
+
+    .mini{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6;}
+
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900;background:#dcfce7;color:var(--green2);} 
+    .badge.blue{background:#dbeafe;color:#1d4ed8;}
+    .badge.gray{background:#f1f5f9;color:#334155;}
+
+    details{border:1px dashed #d1d5db;border-radius:12px;padding:8px 10px;background:#fff;}
+    details summary{cursor:pointer;font-weight:900;color:#0b4a6e;}
+
+    a{color:#0b4a6e;text-decoration:none;font-weight:900;}
+    a:hover{text-decoration:underline;}
+
+    footer{text-align:center;padding:18px;font-size:12.5px;color:var(--muted);}
+
+    /* ===== Terms / Glossary ===== */
+    .term{
+      display:inline-flex;gap:6px;align-items:baseline;
+      padding:0 6px;border-radius:8px;background:rgba(14,165,233,.08);
+      border:1px solid rgba(14,165,233,.18);
+      margin:0 2px;
+    }
+    .term b{font-weight:900;}
+    .term small{color:var(--muted);font-weight:900;}
+
+    .glossaryBtn{
+      position:fixed;left:14px;bottom:14px;z-index:1000;
+      border:none;border-radius:999px;
+      padding:10px 12px;font-weight:900;cursor:pointer;
+      background:linear-gradient(90deg,var(--blue),var(--green));
+      color:#fff;box-shadow:0 10px 25px rgba(0,0,0,.14);
+    }
+
+    .glossary{
+      position:fixed;left:14px;bottom:64px;z-index:1000;
+      width:min(440px, calc(100vw - 28px));
+      background:#fff;border:1px solid #cbd5e1;border-radius:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.18);
+      overflow:hidden;display:none;
+    }
+    .glossaryHeader{
+      display:flex;gap:10px;align-items:center;justify-content:space-between;
+      padding:10px 12px;background:var(--head);border-bottom:1px solid var(--line);
+      color:var(--blue2);font-weight:900;
+    }
+    .glossaryHeader .x{border:none;background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:6px 10px;cursor:pointer;font-weight:900;}
+    .glossaryBody{padding:10px 12px;max-height:55vh;overflow:auto;}
+    .glossarySearch{width:100%;padding:10px 12px;border-radius:14px;border:1px solid #cbd5e1;font-size:13px;outline:none;margin-bottom:10px;}
+    .gItem{padding:10px 10px;border:1px solid var(--line);border-radius:14px;margin:8px 0;}
+    .gItem .en{font-weight:1000;color:#0b4a6e;}
+    .gItem .ar{color:#1f2d3d;margin-top:3px;font-weight:800;}
+    .gItem .ex{color:var(--muted);margin-top:3px;font-size:12px;line-height:1.6;}
+  </style>
+</head>
+
+<body>
+  <header>Medical Sales Ultimate Reference (AR/EN) — Dashboard</header>
+
+  <div class="container">
+
+    <div class="topbar">
+      <input type="text" class="search-box" placeholder="ابحث بسرعة: منتج / مكون / مشكلة صحية / شكوى..." onkeyup="searchAll()" />
+      <div class="chips">
+        <a class="chip" href="#blood">سكر الدم</a>
+        <a class="chip" href="#weight">التخسيس</a>
+        <a class="chip" href="#immune">المناعة</a>
+        <a class="chip" href="#vits">فيتامينات/معادن</a>
+        <a class="chip" href="#gut">الهضم/القولون</a>
+        <a class="chip" href="#men">صحة الرجل</a>
+        <a class="chip" href="#heart">القلب/الدهون</a>
+        <a class="chip" href="#sport">رياضة/بروتين</a>
+        <a class="chip" href="#energy">طاقة/تركيز</a>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>مهم (Regulatory-safe | آمن قانونيًا):</b>
+      استخدم دائمًا عبارات
+      <span class="term"><b>Supports</b><small>يدعم</small></span>
+      /
+      <span class="term"><b>Helps maintain</b><small>يساعد في الحفاظ على</small></span>
+      /
+      <span class="term"><b>Contributes to</b><small>يساهم في</small></span>
+      بدل "يعالج" أو "يشفي".
+      <br/>
+      <b>الروابط (Links):</b> كل روابط العرض/البحث هنا تم ضبطها لتفتح منتجات من
+      <b>www.maxmuscleelite.com</b> فقط.
+      <br/>
+      <b>ملاحظة البحث:</b> البحث داخل MaxMuscleElite أحيانًا يحتاج كلمة أقصر (مثال: <span class="term"><b>flax</b><small>بدل flaxseed</small></span>) — تم تفعيل <b>Smart Search</b> تلقائيًا.
+    </div>
+<!-- =========================
+     PART 2/4 — SECTIONS A
+     (blood + weight + immune)
+========================= -->
+
+    <!-- ================= 1) Blood Sugar ================= -->
+    <div class="section" id="blood">
+      <div class="section-title">مكملات دعم سكر الدم <small>| Blood Sugar Support</small></div>
+      <table class="refTable">
+        <thead>
+          <tr>
+            <th style="width:18%">Product Identity<br/>بيانات المنتج + لينك</th>
+            <th style="width:14%">Active Ingredients & Mechanism<br/>التركيب وآلية العمل</th>
+            <th style="width:12%">Core Benefits<br/>الفوائد</th>
+            <th style="width:10%">Indications<br/>لِمَن؟</th>
+            <th style="width:10%">Dosage & Use<br/>الجرعة والاستخدام</th>
+            <th style="width:12%">Warnings & Side Effects<br/>تحذيرات/أضرار</th>
+            <th style="width:10%">Competitive Edge (USP)<br/>ميزة تنافسية</th>
+            <th style="width:14%">FAQ + Sales Script<br/>ردود جاهزة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Oat Beta-Glucan (بيتا جلوكان الشوفان)
+              <div class="mini">Fiber Powder | مسحوق ألياف</div>
+              <div class="mini"><a class="mmLink" data-search="beta" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div>
+            </td>
+            <td>β-Glucan fiber — Delays <span class="term"><b>Glucose absorption</b><small>امتصاص الجلوكوز</small></span> + improves post-meal response.</td>
+            <td><span class="term"><b>Supports</b><small>يدعم</small></span> Glycemic Control (ضبط السكر) + Satiety (الشبع).</td>
+            <td>Prediabetes (ما قبل السكر) / <span class="term"><b>T2DM</b><small>سكري نوع 2</small></span> support + Weight support.</td>
+            <td>Once daily with meal (مرة يوميًا مع الأكل). يظهر خلال 2–6 أسابيع.</td>
+            <td>Gas/Bloating (انتفاخ) خاصة أول أسبوع. حساسية الشوفان نادرة.</td>
+            <td>Evidence-based soluble fiber (ألياف ذائبة مدعومة).</td>
+            <td>
+              <details><summary>ردود سريعة</summary>
+                <b>Safe? (آمن؟)</b> غالبًا آمن. <br/>
+                <b>When works? (إمتى يبان؟)</b> خلال أسابيع مع نظام غذائي. <br/>
+                <b>Pitch (جملة بيع):</b> "ألياف ذائبة تساعد تقلل سكر بعد الأكل وتدي شبع".
+              </details>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Chromium Picolinate (كروميوم)
+              <div class="mini">Capsules/Tablets | كبسولات/أقراص</div>
+              <div class="mini"><a class="mmLink" data-search="chrom" target="_blank">عرض على MaxMuscleElite</a></div>
+            </td>
+            <td>Chromium — <span class="term"><b>Supports</b><small>يدعم</small></span> insulin action (حساسية الإنسولين) & carb metabolism (أيض الكربوهيدرات).</td>
+            <td><span class="term"><b>Helps maintain</b><small>يساعد في الحفاظ على</small></span> normal glucose (سكر طبيعي).</td>
+            <td>Cravings (اشتهاء سكريات) / Prediabetes support.</td>
+            <td>Once daily after meal (مرة بعد الأكل) لمدة 8–12 أسبوع.</td>
+            <td><span class="term"><b>GI upset</b><small>اضطراب معدة/مغص</small></span> نادر. مرضى الكُلى يستشيروا طبيب.</td>
+            <td>Simple add-on with diet plan (سهل كإضافة).</td>
+            <td><details><summary>FAQ</summary><b>ينفع مع أدوية سكر؟</b> غالبًا نعم لكن الأفضل متابعة الطبيب خصوصًا جرعات عالية.</details></td>
+          </tr>
+
+          <tr>
+            <td>
+              Berberine (بربرين)
+              <div class="mini">Capsules | كبسولات</div>
+              <div class="mini"><a class="mmLink" data-search="berb" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge gray">Pro Tip</span></div>
+            </td>
+            <td>Berberine — Supports glucose & lipid metabolism (يدعم السكر والدهون) عبر مسارات أيضية.</td>
+            <td>Supports glucose + lipids (يدعم السكر + الدهون).</td>
+            <td>T2DM support / dyslipidemia (دهون مرتفعة) support.</td>
+            <td>1–2 times daily with meals (مع الأكل). يبدأ خلال 2–4 أسابيع.</td>
+            <td>May cause diarrhea/constipation (إسهال/إمساك). تداخلات دوائية ممكنة (استشارة).</td>
+            <td>Dual benefit: sugar + lipids (ميزة مزدوجة).</td>
+            <td><details><summary>Sales</summary><b>Pitch:</b> "مناسب للي عنده سكر ودهون معًا—لكن لازم استخدام مسؤول".</details></td>
+          </tr>
+
+          <tr>
+            <td>
+              Alpha-Lipoic Acid <span class="term"><b>ALA</b><small>اختصار Alpha-Lipoic Acid</small></span> (ألفا ليبويك)
+              <div class="mini">Capsules | كبسولات</div>
+              <div class="mini"><a class="mmLink" data-search="lipo" target="_blank">عرض على MaxMuscleElite</a></div>
+            </td>
+            <td>Antioxidant — Supports nerve health (يدعم الأعصاب) & glucose metabolism (أيض السكر).</td>
+            <td>Supports nerve comfort (يدعم الأعصاب) + glucose support.</td>
+            <td>Diabetic neuropathy support (تنميل/أعصاب).</td>
+            <td>Once daily (مرة يوميًا). مدة 8–12 أسبوع.</td>
+            <td>Low blood sugar risk with meds (هبوط سكر) — تنبيه لمرضى أدوية السكر.</td>
+            <td>"Sugar + nerves" positioning (سكر + أعصاب).</td>
+            <td><details><summary>FAQ</summary><b>تنميل الرجلين؟</b> يدعم الأعصاب لكن لو شديد/مستمر لازم طبيب.</details></td>
+          </tr>
+
+          <tr>
+            <td>
+              Psyllium Husk (قشور السيليوم)
+              <div class="mini">Powder/Sachets | بودرة/أكياس</div>
+              <div class="mini"><a class="mmLink" data-search="psyll" target="_blank">عرض على MaxMuscleElite</a></div>
+            </td>
+            <td>Soluble fiber — Slows carb absorption (يقلل امتصاص الكارب) + improves bowel movement (يحسن حركة الأمعاء).</td>
+            <td>Supports glucose + constipation relief (سكر + إمساك).</td>
+            <td><span class="term"><b>IBS-C</b><small>قولون عصبي مع إمساك</small></span> support + glucose support.</td>
+            <td>1 dose with plenty water (مع ماء كتير). يُفضّل بعيد عن الأدوية بساعتين.</td>
+            <td>Choking risk if no water (خطر اختناق بدون ماء). انسداد أمعاء: ممنوع.</td>
+            <td>2-in-1: gut + sugar (ميزة مزدوجة).</td>
+            <td><details><summary>Sales</summary><b>اعتراض:</b> "بينتفخ" → ابدأ بجرعة صغيرة وزوّد تدريجيًا.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 2) Weight Loss ================= -->
+    <div class="section" id="weight">
+      <div class="section-title">التخسيس وحرق الدهون <small>| Weight Loss & Fat Burn</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Green Tea Extract (مستخلص الشاي الأخضر)<div class="mini">Capsules | كبسولات</div><div class="mini"><a class="mmLink" data-search="green" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td><span class="term"><b>EGCG</b><small>مركّب بالشاي الأخضر</small></span> — Supports metabolism (الأيض) & antioxidants (مضاد أكسدة).</td>
+            <td>Supports fat metabolism (يدعم حرق الدهون) + antioxidants.</td>
+            <td>Overweight + lifestyle program (زيادة وزن).</td>
+            <td>1–2/day with food (مع الأكل). 8 أسابيع تقييم.</td>
+            <td>Caffeine sensitivity (حساسية كافيين)/أرق. مشاكل كبد نادرة مع جرعات عالية.</td>
+            <td>Popular + easy to position (مطلوب).</td>
+            <td><details><summary>رد سريع</summary>"مش سحر" → لازم عجز سعرات + حركة.</details></td>
+          </tr>
+          <tr>
+            <td>Caffeine + L-Carnitine (كافيين + كارنيتين)<div class="mini">Pre-workout / Caps | قبل التمرين</div><div class="mini"><a class="mmLink" data-search="carnit" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Energy + fatty acid transport support (يدعم استخدام الدهون) + alertness (انتباه).</td>
+            <td>Helps maintain energy in diet (طاقة أثناء الدايت).</td>
+            <td>Fatigue with diet (إرهاق الدايت) + training.</td>
+            <td>Morning / pre-workout (صباحًا/قبل التمرين).</td>
+            <td>Palpitations/anxiety (خفقان/توتر) لمن لديه حساسية كافيين.</td>
+            <td>"Energy + fat" combo (طاقة + دهون).</td>
+            <td><details><summary>FAQ</summary>"بينفع من غير جيم؟" الأفضل مع مشي ونظام.</details></td>
+          </tr>
+          <tr>
+            <td>Glucomannan (جلوكومانان)<div class="mini">Sachets/Caps | ألياف شبع</div><div class="mini"><a class="mmLink" data-search="gluco" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Soluble fiber — increases satiety (ألياف تزيد الشبع).</td>
+            <td><span class="term"><b>Contributes to</b><small>يساهم في</small></span> satiety (الشبع).</td>
+            <td>Overeating / cravings (شهية مفتوحة).</td>
+            <td>Before meals with water (قبل الأكل بماء كتير).</td>
+            <td>انسداد/اختناق لو بدون ماء. مشاكل بلع: ممنوع.</td>
+            <td>Fast hunger control (أسرع في كتم الجوع).</td>
+            <td><details><summary>Sales</summary>"للجوع" → قبل 30 دقيقة من الوجبة.</details></td>
+          </tr>
+          <tr>
+            <td>CLA (حمض اللينوليك المترافق)<div class="mini">Softgels | كبسولات زيت</div><div class="mini"><a class="mmLink" data-search="cla" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Fat metabolism support (يدعم تمثيل الدهون) — results vary (نتائج تختلف).</td>
+            <td>Supports body composition (يدعم شكل الجسم).</td>
+            <td>Body recomposition (تنشيف/تحسين الشكل).</td>
+            <td>With meals (مع الأكل) 8–12 أسبوع.</td>
+            <td><span class="term"><b>GI upset</b><small>اضطراب معدة</small></span> possible. مرضى كبد/سكر: حذر.</td>
+            <td>Gym audience friendly (مناسب للجيم).</td>
+            <td><details><summary>FAQ</summary>"ينزل قد إيه؟" اختلاف فردي—الالتزام أهم.</details></td>
+          </tr>
+          <tr>
+            <td>Apple Cider Vinegar (خل التفاح)<div class="mini">Gummies/Caps | جُمّي/كبسولات</div><div class="mini"><a class="mmLink" data-search="apple" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>May support appetite control (قد يدعم الشهية) — mild effect (تأثير بسيط).</td>
+            <td>Helps maintain appetite control (يدعم التحكم في الشهية).</td>
+            <td>Light weight support.</td>
+            <td>Once daily (مرة يوميًا).</td>
+            <td><span class="term"><b>GERD</b><small>ارتجاع/حموضة مزمنة</small></span> — حذر لمرضى الارتجاع.</td>
+            <td>High acceptance (مقبول للناس).</td>
+            <td><details><summary>Sales</summary>للناس اللي عايزة حاجة خفيفة وآمنة نسبيًا.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 3) Immunity ================= -->
+    <div class="section" id="immune">
+      <div class="section-title">دعم المناعة <small>| Immunity Support</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Vitamin C (فيتامين سي)<div class="mini">Tablets/ Effervescent | أقراص/فوار</div><div class="mini"><a class="mmLink" data-search="vit c" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div></td>
+            <td>Antioxidant + immune function (مضاد أكسدة + مناعة).</td>
+            <td><span class="term"><b>Supports</b><small>يدعم</small></span> immune function (وظيفة المناعة).</td>
+            <td>Colds season (موسم برد) / fatigue (إرهاق).</td>
+            <td>Once daily (مرة يوميًا) بعد الأكل.</td>
+            <td>Stomach upset if empty (حموضة). حصوات كلى: جرعات عالية بحذر.</td>
+            <td>Fast, familiar, low objection (سهل البيع).</td>
+            <td><details><summary>FAQ</summary>"هيمنع البرد؟" يدعم المناعة لكن مش ضمان.</details></td>
+          </tr>
+
+          <tr>
+            <td>Vitamin D3 (فيتامين د3)<div class="mini">Tablets/Caps | أقراص/كبسولات</div><div class="mini"><a class="mmLink" data-search="vit d" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Immune modulation + bone support (تنظيم مناعة + عظام).</td>
+            <td>Helps maintain immune balance (توازن المناعة).</td>
+            <td>Low sun exposure (قلة شمس) + bone support.</td>
+            <td>Daily or weekly per strength (حسب التركيز).</td>
+            <td>High dose: avoid without labs (جرعات عالية بدون تحليل).</td>
+            <td>Huge demand (طلب عالي).</td>
+            <td><details><summary>Sales</summary>"قليل شمس" → د3 + متابعة تحليل لو جرعة عالية.</details></td>
+          </tr>
+
+          <tr>
+            <td>Zinc (زنك)<div class="mini">Tablets/Caps | أقراص/كبسولات</div><div class="mini"><a class="mmLink" data-search="zinc" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Supports immune cells + wound healing (يدعم خلايا المناعة).</td>
+            <td>Supports immunity + skin (مناعة + جلد).</td>
+            <td>Frequent colds (برد متكرر) / hair (شعر).</td>
+            <td>Once daily after food (بعد الأكل).</td>
+            <td>Nausea on empty stomach (غثيان). Long high dose ↓Copper (نقص نحاس).</td>
+            <td>Great add-on with Vit C/D (ممتاز مع سي/د).</td>
+            <td><details><summary>FAQ</summary>"للشعر؟" يدعم لو في نقص—الأفضل تحاليل.</details></td>
+          </tr>
+
+          <tr>
+            <td>Elderberry (إلدربيري)<div class="mini">Syrup/Gummies | شراب/جُمّي</div><div class="mini"><a class="mmLink" data-search="elder" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Antioxidants — immune support (دعم مناعي) موسمي.</td>
+            <td>Supports immune response (يدعم الاستجابة المناعية).</td>
+            <td>Cold season, kids (موسم برد/أطفال).</td>
+            <td>Daily during season (يوميًا بالموسم).</td>
+            <td>Autoimmune patients: ask doctor (مناعة ذاتية).</td>
+            <td>Family friendly (مناسب للعائلة).</td>
+            <td><details><summary>Sales</summary>موسمي—أفضل بداية الشتاء.</details></td>
+          </tr>
+
+          <tr>
+            <td>Probiotics (بروبايوتيك)<div class="mini">Caps/Sachets | كبسولات/أكياس</div><div class="mini"><a class="mmLink" data-search="probi" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Gut microbiota support → immunity axis (ميكروبيوم الأمعاء).</td>
+            <td>Supports digestion + immunity (هضم + مناعة).</td>
+            <td>After antibiotics (بعد مضاد) / bloating (انتفاخ).</td>
+            <td>Daily 2–4 weeks (يوميًا).</td>
+            <td>Gas first days (غازات). Immunocompromised: doctor.</td>
+            <td>"Gut-Immune" story (محور الأمعاء-المناعة).</td>
+            <td><details><summary>FAQ</summary>"بعد مضاد حيوي" → ممتاز + خليه بعيد ساعتين.</details></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+<!-- =========================
+     PART 3/4 — SECTIONS B
+     (vits + gut + men + heart + sport + energy)
+========================= -->
+
+    <!-- ================= 4) Vitamins & Minerals ================= -->
+    <div class="section" id="vits">
+      <div class="section-title">فيتامينات ومعادن <small>| Vitamins & Minerals</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Multivitamin (مالتي فيتامين)<div class="mini">Tablets | أقراص</div><div class="mini"><a class="mmLink" data-search="multi" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div></td>
+            <td>Broad micronutrients (مجموعة عناصر) — fills gaps (يسد النقص).</td>
+            <td>Supports overall health (صحة عامة).</td>
+            <td>Busy lifestyle / poor diet (نظام ضعيف).</td>
+            <td>Once daily with meal (مرة يوميًا مع الأكل).</td>
+            <td>Iron content may upset stomach. Avoid doubling (متجمعش نفس الفيتامينات).</td>
+            <td>One-product solution (حل شامل).</td>
+            <td><details><summary>Sales</summary>"لو أكلك مش متوازن" → مالتي فيتامين يومي.</details></td>
+          </tr>
+
+          <tr>
+            <td>B-Complex (فيتامينات ب)<div class="mini">Tablets/Caps | أقراص/كبسولات</div><div class="mini"><a class="mmLink" data-search="b complex" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>B vitamins — energy metabolism + nerves (طاقة + أعصاب).</td>
+            <td>Helps reduce fatigue (يساعد تقليل الإرهاق).</td>
+            <td>Fatigue / stress (إرهاق/ضغط).</td>
+            <td>Morning with food (صباحًا بعد الأكل).</td>
+            <td>May cause nausea (غثيان). Urine yellow (طبيعي).</td>
+            <td>Fast perceived benefit (إحساس سريع).</td>
+            <td><details><summary>FAQ</summary>"ينفع يوميًا؟" نعم بجرعات معتدلة.</details></td>
+          </tr>
+
+          <tr>
+            <td>Magnesium (ماغنسيوم)<div class="mini">Tablets | أقراص</div><div class="mini"><a class="mmLink" data-search="magnes" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Muscle/nerve function (عضلات/أعصاب) + sleep support (نوم).</td>
+            <td>Supports cramps + sleep (تقلصات + نوم).</td>
+            <td>Muscle cramps (شد) / sleep issues (نوم).</td>
+            <td>Evening after meal (مساءً).</td>
+            <td>Diarrhea with high dose (إسهال). Kidney disease: doctor.</td>
+            <td>Very common complaint solver (حل شائع).</td>
+            <td><details><summary>Sales</summary>"شد عضلي" → ماغنسيوم مساءً + مياه.</details></td>
+          </tr>
+
+          <tr>
+            <td>Iron + Folic Acid (حديد + فوليك)<div class="mini">Tablets | أقراص</div><div class="mini"><a class="mmLink" data-search="iron" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Supports hemoglobin (يدعم الهيموجلوبين).</td>
+            <td>Helps maintain iron levels (يحافظ على الحديد).</td>
+            <td>Anemia support (أنيميا) — after labs (بعد تحليل).</td>
+            <td>Once daily; best away from tea/coffee (بعيد عن شاي/قهوة).</td>
+            <td>Constipation/black stool (إمساك/براز غامق). Not for high iron.</td>
+            <td>Clear KPI: labs improve (نتيجة تحليل).</td>
+            <td><details><summary>FAQ</summary>"بيعمل إمساك" → مياه/ألياف/نوع ألطف.</details></td>
+          </tr>
+
+          <tr>
+            <td>Omega-3 Fish Oil (أوميجا 3)<div class="mini">Softgels | كبسولات زيت</div><div class="mini"><a class="mmLink" data-search="omega" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div></td>
+            <td><span class="term"><b>EPA/DHA</b><small>مكونات أوميجا الأساسية</small></span> — heart + inflammation support (قلب + التهابات).</td>
+            <td>Supports heart & triglycerides (يدعم القلب والدهون).</td>
+            <td>Dyslipidemia / joint comfort (دهون/مفاصل).</td>
+            <td>With meals daily (يوميًا مع الأكل).</td>
+            <td>Fishy burps; on blood thinners: doctor.</td>
+            <td>Trust product; easy cross-sell (سهل الإقناع).</td>
+            <td><details><summary>Sales</summary>"لو بتاكل سمك قليل" → أوميجا 3 يومي.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 5) Gut / Colon ================= -->
+    <div class="section" id="gut">
+      <div class="section-title">الهضم والقولون <small>| Gut & IBS Support</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Probiotics Multi-strain (بروبايوتيك متعدد)<div class="mini">Caps/Sachets | كبسولات/أكياس</div><div class="mini"><a class="mmLink" data-search="probi" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Balances microbiota (توازن البكتيريا النافعة) → less bloating (انتفاخ أقل).</td>
+            <td>Supports bloating relief (انتفاخ) + regularity (انتظام).</td>
+            <td>After antibiotics / IBS (بعد مضاد/قولون).</td>
+            <td>Daily for 2–4 weeks (يوميًا).</td>
+            <td>Gas first days. Immunocompromised: doctor.</td>
+            <td>High repeat purchase (إعادة شراء).</td>
+            <td><details><summary>FAQ</summary>"إسهال من المضاد" → بروبايوتيك + سوائل.</details></td>
+          </tr>
+
+          <tr>
+            <td>Prebiotic Inulin (إينولين)<div class="mini">Powder | بودرة</div><div class="mini"><a class="mmLink" data-search="inulin" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Feeds good bacteria (غذاء للبكتيريا النافعة).</td>
+            <td><span class="term"><b>Contributes to</b><small>يساهم في</small></span> gut health (صحة الأمعاء).</td>
+            <td>Constipation / microbiome support.</td>
+            <td>Start low dose (ابدأ قليل) ثم زيادة تدريجيًا.</td>
+            <td>Bloating if high fast (انتفاخ).</td>
+            <td>Pairs well with probiotics (سينرجي).</td>
+            <td><details><summary>Sales</summary><span class="term"><b>Synbiotic</b><small>برو + بري</small></span> = Probiotic + Prebiotic.</details></td>
+          </tr>
+
+          <tr>
+            <td>Peppermint Oil (زيت النعناع)<div class="mini">Enteric-coated caps | كبسولات معوية</div><div class="mini"><a class="mmLink" data-search="pepper" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Relaxes intestinal spasm (يرخي التقلصات) — IBS support.</td>
+            <td>Helps reduce cramps (يقلل مغص) + gas.</td>
+            <td>IBS cramps (مغص القولون).</td>
+            <td>Before meals per label (قبل الأكل).</td>
+            <td><span class="term"><b>GERD</b><small>ارتجاع</small></span> may worsen — حذر.</td>
+            <td>Fast symptom relief (مفعول سريع).</td>
+            <td><details><summary>FAQ</summary>"حموضة" → لو عنده ارتجاع اختار بديل.</details></td>
+          </tr>
+
+          <tr>
+            <td>Digestive Enzymes (إنزيمات هضم)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="enzyme" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Helps break down food (يساعد هضم الدهون/البروتين/كارب).</td>
+            <td>Supports heavy meal digestion (هضم الوجبات التقيلة).</td>
+            <td>After heavy meals / bloating.</td>
+            <td>With meals (مع الوجبة).</td>
+            <td>Pancreatitis patients: doctor. Allergy caution.</td>
+            <td>Quick satisfaction (رضا سريع).</td>
+            <td><details><summary>Sales</summary>"بتتعب بعد الأكل" → خده مع الوجبة.</details></td>
+          </tr>
+
+          <tr>
+            <td>Lactase (لاكتاز)<div class="mini">Tablets | أقراص</div><div class="mini"><a class="mmLink" data-search="lactase" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Breaks lactose (يهضم اللاكتوز) — for lactose intolerance.</td>
+            <td>Helps reduce dairy bloating (انتفاخ مع لبن).</td>
+            <td>Lactose intolerance (عدم تحمل اللاكتوز).</td>
+            <td>Right before dairy (قبل الألبان مباشرة).</td>
+            <td>Generally safe (آمن غالبًا).</td>
+            <td>Clear problem → clear solution (مشكلة واضحة).</td>
+            <td><details><summary>FAQ</summary>"كل ما أشرب لبن أنتفخ" → لاكتاز قبل اللبن.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 6) Men's Health ================= -->
+    <div class="section" id="men">
+      <div class="section-title">صحة الرجل <small>| Men’s Health</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Ashwagandha (أشواجندا)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="ashwa" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td><span class="term"><b>Adaptogen</b><small>مقاوم توتر</small></span> — stress/cortisol support (دعم مقاومة التوتر).</td>
+            <td>Supports stress + vitality (توتر + نشاط).</td>
+            <td>Stress-related fatigue / sleep.</td>
+            <td>Daily, evening preferred (مساءً).</td>
+            <td>Thyroid meds/autoimmune: doctor. Drowsy possible.</td>
+            <td>Top trend supplement (ترند قوي).</td>
+            <td><details><summary>Sales</summary>"توتر + نوم" → أشواجندا مساءً.</details></td>
+          </tr>
+
+          <tr>
+            <td>Tribulus (تريبولس)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="trib" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Traditionally used for male vitality (دعم حيوية).</td>
+            <td>Supports performance (يدعم الأداء).</td>
+            <td>Low libido complaints (رغبة منخفضة).</td>
+            <td>Daily per label (حسب العبوة).</td>
+            <td>BP meds/heart disease: caution. Not for teens.</td>
+            <td>Strong market demand.</td>
+            <td><details><summary>FAQ</summary>"بيزود هرمون؟" دعم عام—نتائج تختلف، ونشدد على نمط الحياة.</details></td>
+          </tr>
+
+          <tr>
+            <td>Ginseng (جينسنغ)<div class="mini">Caps/Tea | كبسولات/شاي</div><div class="mini"><a class="mmLink" data-search="ginseng" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Energy + circulation support (طاقة + دورة دموية).</td>
+            <td>Helps reduce fatigue (يقلل الإرهاق).</td>
+            <td>Fatigue / focus.</td>
+            <td>Morning (صباحًا).</td>
+            <td>Insomnia if late. BP meds: caution.</td>
+            <td>Classic trusted herb (موثوق).</td>
+            <td><details><summary>Sales</summary>"كسل" → جينسنغ صباحًا + نوم كويس.</details></td>
+          </tr>
+
+          <tr>
+            <td>Saw Palmetto (ساو بالميتو)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="palmet" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Prostate support (دعم البروستاتا) — urinary comfort (راحة التبول).</td>
+            <td>Supports prostate comfort (راحة البروستاتا).</td>
+            <td>Frequent urination (تبول متكرر).</td>
+            <td>Daily for 8–12 weeks (8–12 أسبوع).</td>
+            <td>Hormone-related conditions: doctor.</td>
+            <td>Specific target (هدف محدد).</td>
+            <td><details><summary>FAQ</summary>"محتاج دكتور؟" لو ألم/دم/احتباس بول → طبيب فورًا.</details></td>
+          </tr>
+
+          <tr>
+            <td>Zinc + Selenium (زنك + سيلينيوم)<div class="mini">Tablets | أقراص</div><div class="mini"><a class="mmLink" data-search="selen" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Male fertility antioxidants (مضادات أكسدة للخصوبة).</td>
+            <td>Supports fertility parameters (يدعم الخصوبة).</td>
+            <td>Trying to conceive (تحسين خصوبة).</td>
+            <td>Once daily after meal (بعد الأكل).</td>
+            <td>Don’t exceed selenium dose. Thyroid: ask doctor.</td>
+            <td>Clear fertility positioning.</td>
+            <td><details><summary>Sales</summary>"3 شهور" لأنه دورة تكوين الحيوان المنوي.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 7) Heart / Lipids ================= -->
+    <div class="section" id="heart">
+      <div class="section-title">القلب والدهون <small>| Heart & Lipids</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Omega-3 (EPA/DHA) (أوميجا 3)<div class="mini">Softgels | كبسولات زيت</div><div class="mini"><a class="mmLink" data-search="omega" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div></td>
+            <td>Supports triglycerides + inflammation (دهون ثلاثية + التهاب).</td>
+            <td>Supports heart health (يدعم القلب).</td>
+            <td>High TG / low fish intake.</td>
+            <td>Daily with meals (يوميًا مع الأكل).</td>
+            <td>Blood thinners: doctor. Fish allergy.</td>
+            <td>Mass market essential.</td>
+            <td><details><summary>FAQ</summary>"بيرجع ريحة" → خده مع الأكل/قبل النوم/نوع Enteric.</details></td>
+          </tr>
+
+          <tr>
+            <td>CoQ10 (كوينزيم كيو10)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="coq" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Mitochondrial energy + antioxidant (طاقة الخلايا) — heart support.</td>
+            <td>Supports energy & heart (طاقة + قلب).</td>
+            <td>Statin users fatigue (إرهاق مع أدوية دهون).</td>
+            <td>Daily with fat meal (مع وجبة فيها دهون).</td>
+            <td>May interact with warfarin (سيولة).</td>
+            <td>Great add-on for statins.</td>
+            <td><details><summary>Sales</summary>"مع أدوية الكوليسترول" → كيو10 لتعب العضلات.</details></td>
+          </tr>
+
+          <tr>
+            <td>Plant Sterols (ستيرولات نباتية)<div class="mini">Caps/Spreads | كبسولات/دهانات غذائية</div><div class="mini"><a class="mmLink" data-search="sterol" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Reduces cholesterol absorption (يقلل امتصاص الكوليسترول).</td>
+            <td>Helps maintain healthy cholesterol (يساعد الحفاظ على كوليسترول صحي).</td>
+            <td>Mild high LDL with diet.</td>
+            <td>With meals (مع الوجبات).</td>
+            <td>May reduce fat-soluble vitamins absorption (A/D/E/K).</td>
+            <td>Mechanism easy to explain (شرح سهل).</td>
+            <td><details><summary>FAQ</summary>"بديل دواء؟" لا—دعم مع الدايت.</details></td>
+          </tr>
+
+          <tr>
+            <td>Garlic Extract (مستخلص الثوم)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="garlic" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Supports circulation (دعم الدورة) — mild BP/lipid support.</td>
+            <td>Supports heart (يدعم القلب).</td>
+            <td>Mild BP/LDL support.</td>
+            <td>Daily after meals (بعد الأكل).</td>
+            <td>Blood thinners caution. Odor/heartburn.</td>
+            <td>Traditional trusted.</td>
+            <td><details><summary>Sales</summary>"دعم بسيط" للي مش عايز دواء.</details></td>
+          </tr>
+
+          <tr>
+            <td>Flaxseed (كتان)<div class="mini">Powder/Oil | بودرة/زيت</div><div class="mini"><a class="mmLink" data-search="flax" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Fiber + ALA omega-3 support (دهون + ألياف).</td>
+            <td>Supports lipids & gut (دهون + هضم).</td>
+            <td>Constipation + lipids.</td>
+            <td>Daily (يوميًا).</td>
+            <td>GI upset if fast increase (لو زودت بسرعة).</td>
+            <td>Two benefits (ميزة مزدوجة).</td>
+            <td><details><summary>FAQ</summary>"للدهون" → مع دايت قليل دهون مشبعة.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 8) Sports / Protein ================= -->
+    <div class="section" id="sport">
+      <div class="section-title">رياضة وبروتين <small>| Sports Performance</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Whey Protein (واي بروتين)<div class="mini">Powder | بودرة</div><div class="mini"><a class="mmLink" data-search="whey" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div></td>
+            <td>High quality protein — muscle recovery (تعافي العضلات).</td>
+            <td>Supports muscle building (يبني عضل) + recovery.</td>
+            <td>Gym / low protein diet.</td>
+            <td>1 scoop post-workout or as meal add-on.</td>
+            <td>Milk intolerance (لاكتوز) — choose isolate/lactase.</td>
+            <td>Most demanded gym item.</td>
+            <td><details><summary>FAQ</summary>"بيبوظ الكُلى؟" لو سليم غالبًا لا، لكن مرضى كلى لازم طبيب.</details></td>
+          </tr>
+
+          <tr>
+            <td>Creatine Monohydrate (كرياتين مونوهيدرات)<div class="mini">Powder | بودرة</div><div class="mini"><a class="mmLink" data-search="creat" target="_blank">عرض على MaxMuscleElite</a> • <span class="badge blue">Top Seller</span></div></td>
+            <td><span class="term"><b>ATP</b><small>طاقة العضلة</small></span> regeneration — strength/power (قوة/أداء).</td>
+            <td>Improves strength & performance (قوة وأداء).</td>
+            <td>High-intensity training (تمارين قوية).</td>
+            <td>3–5g daily (يوميًا) مع ماء. لا يحتاج تحميل.</td>
+            <td>Water retention (احتباس بسيط). Kidney disease: doctor.</td>
+            <td>Most researched sports supplement.</td>
+            <td><details><summary>Sales</summary>"أكثر مكمل عليه أبحاث" + "نتيجة واضحة".</details></td>
+          </tr>
+
+          <tr>
+            <td>BCAA (بي سي ايه ايه)<div class="mini">Powder | بودرة</div><div class="mini"><a class="mmLink" data-search="bcaa" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Leucine/Isoleucine/Valine — muscle support.</td>
+            <td>Supports recovery (تعافي).</td>
+            <td>Training fatigue (إجهاد تمرين).</td>
+            <td>During workout (أثناء التمرين).</td>
+            <td>Not needed if protein adequate (مش ضروري مع بروتين كفاية).</td>
+            <td>Easy flavor sell (سهل بالنكهات).</td>
+            <td><details><summary>FAQ</summary>"أختار BCAA ولا Whey؟" الواي أساس، BCAA إضافة.</details></td>
+          </tr>
+
+          <tr>
+            <td>Pre-Workout (قبل التمرين)<div class="mini">Powder | بودرة</div><div class="mini"><a class="mmLink" data-search="pre" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Caffeine + pumps — energy focus (طاقة/تركيز).</td>
+            <td>Boosts workout energy (طاقة).</td>
+            <td>Low motivation/energy (كسل).</td>
+            <td>20–30 min before training (قبل التمرين).</td>
+            <td>Heart/BP/anxiety: caution. Not late (أرق).</td>
+            <td>Immediate felt effect (مفعول محسوس).</td>
+            <td><details><summary>Sales</summary>ابدأ بنص سكوب لتقييم التحمل.</details></td>
+          </tr>
+
+          <tr>
+            <td>Casein Protein (كازين)<div class="mini">Powder | بودرة</div><div class="mini"><a class="mmLink" data-search="casein" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Slow-digest protein (بطيء الهضم).</td>
+            <td>Supports overnight recovery (تعافي أثناء النوم).</td>
+            <td>Before sleep protein needs.</td>
+            <td>1 scoop before sleep (قبل النوم).</td>
+            <td>Milk intolerance caution.</td>
+            <td>Clear timing advantage (ميزة توقيت).</td>
+            <td><details><summary>FAQ</summary>"واي ولا كازين؟" واي بعد التمرين، كازين قبل النوم.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ================= 9) Energy / Focus ================= -->
+    <div class="section" id="energy">
+      <div class="section-title">طاقة وتركيز <small>| Energy & Focus</small></div>
+      <table class="refTable">
+        <thead><tr><th>Product Identity</th><th>Ingredients & Mechanism</th><th>Benefits</th><th>Indications</th><th>Dosage</th><th>Warnings</th><th>USP</th><th>FAQ + Sales</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Omega-3 (أوميجا 3)<div class="mini">Softgels | كبسولات</div><div class="mini"><a class="mmLink" data-search="omega" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Brain support (دعم المخ) عبر DHA.</td>
+            <td>Supports cognition (تركيز).</td>
+            <td>Students / low fish.</td>
+            <td>Daily with meal (يوميًا مع الأكل).</td>
+            <td>Blood thinners caution.</td>
+            <td>Multi-benefit (مزايا متعددة).</td>
+            <td><details><summary>Sales</summary>"تركيز + قلب" في منتج واحد.</details></td>
+          </tr>
+
+          <tr>
+            <td>Ginkgo Biloba (جنكو بيلوبا)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="ginkgo" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Supports circulation (دورة دموية) — memory support.</td>
+            <td>Helps maintain memory (يدعم الذاكرة).</td>
+            <td>Focus complaints (قلة تركيز).</td>
+            <td>Daily morning (صباحًا).</td>
+            <td>Blood thinners caution.</td>
+            <td>Common cognition product.</td>
+            <td><details><summary>FAQ</summary>"ينفع للطلاب؟" دعم تركيز مع نوم ومذاكرة.</details></td>
+          </tr>
+
+          <tr>
+            <td>L-Theanine + Caffeine (ثيانين + كافيين)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="thean" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Smooth focus (تركيز هادي) يقلل توتر الكافيين.</td>
+            <td>Supports focus without jitters (بدون رعشة/توتر).</td>
+            <td>Work/study (شغل/مذاكرة).</td>
+            <td>Morning; avoid late (تجنب متأخر).</td>
+            <td>Insomnia if late (أرق).</td>
+            <td>Great for caffeine sensitive (حساس الكافيين).</td>
+            <td><details><summary>Sales</summary>"تركيز من غير رعشة".</details></td>
+          </tr>
+
+          <tr>
+            <td>Vitamin B12 (فيتامين ب12)<div class="mini">Tabs/Spray | أقراص/سبراي</div><div class="mini"><a class="mmLink" data-search="b12" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td>Nerve + energy metabolism (أعصاب + طاقة).</td>
+            <td>Helps reduce fatigue (يقلل إرهاق).</td>
+            <td>Low energy; veg diet (نباتيين).</td>
+            <td>Daily per label (حسب العبوة).</td>
+            <td>Generally safe.</td>
+            <td>Easy, safe, high demand.</td>
+            <td><details><summary>FAQ</summary>"هينشطني؟" لو في نقص—التحاليل أفضل.</details></td>
+          </tr>
+
+          <tr>
+            <td>Rhodiola (روديولا)<div class="mini">Caps | كبسولات</div><div class="mini"><a class="mmLink" data-search="rhod" target="_blank">عرض على MaxMuscleElite</a></div></td>
+            <td><span class="term"><b>Adaptogen</b><small>مقاوم إرهاق/توتر</small></span> — fatigue resistance (مقاومة الإرهاق).</td>
+            <td>Supports stamina (تحمل).</td>
+            <td>Stress fatigue (إرهاق ضغط).</td>
+            <td>Morning (صباحًا).</td>
+            <td>May cause insomnia if late.</td>
+            <td>Modern work-friendly (مناسب للشغل).</td>
+            <td><details><summary>Sales</summary>"إرهاق شغل" → روديولا صباحًا.</details></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- =========================
+     PART 4/4 — CORE END
+     (footer + glossary + scripts + closing tags)
+========================= -->
+
+  </div>
+
+  <footer>
+    Dashboard v1 — Full Pack • الروابط MaxMuscleElite فقط + قاموس مصطلحات ثابت.
+  </footer>
+
+  <button class="glossaryBtn" onclick="toggleGlossary()">📘 قاموس المصطلحات</button>
+  <div class="glossary" id="glossary">
+    <div class="glossaryHeader">
+      <div>قاموس المصطلحات (EN → AR)</div>
+      <button class="x" onclick="toggleGlossary()">✕</button>
+    </div>
+    <div class="glossaryBody">
+      <input class="glossarySearch" id="gq" placeholder="ابحث داخل القاموس: term / اختصار..." onkeyup="filterGlossary()" />
+      <div id="gList"></div>
+      <div class="mini">ملاحظة: المصطلحات هنا ثابتة بنفس الصياغة عشان تسهّل ردك السريع مع أي عميل.</div>
+    </div>
+  </div>
+
+  <script>
+    function searchAll(){
+      const q = document.querySelector('.search-box').value.toLowerCase();
+      document.querySelectorAll('table.refTable tbody tr').forEach(tr=>{
+        tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    const MM_BASE = 'https://www.maxmuscleelite.com/shop?search=';
+
+    function sanitizeQuery(raw){
+      const s = String(raw||'').trim().toLowerCase();
+      let out = '';
+      for (let i=0;i<s.length;i++){
+        const c = s[i];
+        const isAz = c>='a' && c<='z';
+        const is09 = c>='0' && c<='9';
+        const ok = isAz || is09 || c===' ' || c==='-' || c==='+';
+        out += ok ? c : ' ';
+      }
+      while(out.indexOf('  ')!==-1) out = out.replace('  ',' ');
+      return out.trim();
+    }
+
+    function smartQuery(raw){
+      let q = sanitizeQuery(raw);
+      if(!q) return '';
+      const parts = q.split(' ');
+      if(parts.length >= 2){
+        const a = parts[0];
+        const b = parts[1];
+        const sa = a.length > 8 ? a.slice(0,4) : a;
+        const sb = b.length > 8 ? b.slice(0,4) : b;
+        return (sa + ' ' + sb).trim();
+      }
+      if(q.length > 6) return q.slice(0,4);
+      return q;
+    }
+
+    function mmUrlFrom(linkEl){
+      const manual = linkEl.getAttribute('data-search');
+      const name = linkEl.getAttribute('data-name') || (linkEl.closest('td') ? linkEl.closest('td').innerText : '');
+      const base = manual && manual.trim() ? manual.trim() : name;
+      const query = smartQuery(base);
+      return MM_BASE + encodeURIComponent(query);
+    }
+
+    function applyMmLinks(){
+      document.querySelectorAll('a.mmLink').forEach(a=>{
+        a.setAttribute('href', mmUrlFrom(a));
+        a.setAttribute('target','_blank');
+        a.setAttribute('rel','noopener');
+        if(!a.textContent.trim()) a.textContent = 'عرض على MaxMuscleElite';
+      });
+    }
+
+    const GLOSSARY = [
+      {en:'Supports', ar:'يدعم (دعم عام بدون ادعاء علاج)', ex:'صياغة بيع قانونية بدل "يعالج".'},
+      {en:'Helps maintain', ar:'يساعد في الحفاظ على', ex:'تعني الحفاظ على الحالة الطبيعية.'},
+      {en:'Contributes to', ar:'يساهم في', ex:'تأثير مساعد ضمن نمط حياة.'},
+      {en:'Mechanism of Action', ar:'آلية العمل داخل الجسم', ex:'إزاي المنتج بيشتغل (علميًا).'},
+      {en:'Indications', ar:'الاستخدامات / مناسب لمين؟', ex:'مين العميل المناسب للمنتج.'},
+      {en:'Dosage', ar:'الجرعة وطريقة الاستخدام', ex:'كمية الاستخدام والتوقيت.'},
+      {en:'Warnings', ar:'تحذيرات وموانع استخدام', ex:'حمل/رضاعة/أمراض مزمنة/تداخلات.'},
+      {en:'Side Effects', ar:'آثار جانبية', ex:'أعراض محتملة (شائعة/نادرة).'},
+      {en:'USP', ar:'ميزة تنافسية (Unique Selling Point)', ex:'ليه يختارك المنتج ده تحديدًا.'},
+      {en:'GI upset', ar:'اضطراب معدة/مغص/غثيان', ex:'Gastrointestinal upset.'},
+      {en:'T2DM', ar:'Type 2 Diabetes = سكري نوع 2', ex:'اختصار شائع في الشغل.'},
+      {en:'Prediabetes', ar:'ما قبل السكري', ex:'سكر عالي بسيط قبل التشخيص.'},
+      {en:'IBS', ar:'Irritable Bowel Syndrome = قولون عصبي', ex:'مغص/انتفاخ/تغيير إخراج.'},
+      {en:'IBS-C', ar:'قولون عصبي مع إمساك', ex:'Constipation-predominant.'},
+      {en:'EPA/DHA', ar:'مكونات أوميجا 3 الأساسية', ex:'ده اللي يحدد جودة الأوميجا.'},
+      {en:'ATP', ar:'طاقة العضلة الأساسية', ex:'Creatine يساعد في إعادة تصنيع ATP.'},
+      {en:'Adaptogen', ar:'مقاوم توتر (يدعم التكيف مع الضغط)', ex:'زي Ashwagandha / Rhodiola.'},
+      {en:'Synbiotic', ar:'Synbiotic = بروبيوتيك + بريبيوتيك', ex:'مزيج يدعم البكتيريا النافعة وغذائها.'},
+      {en:'GERD', ar:'ارتجاع مريء/حموضة مزمنة', ex:'Peppermint قد يزيده عند البعض.'}
+    ];
+
+    function escapeHtml(s){
+      return String(s??'').replace(/[&<>"']/g, m=>({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[m]));
+    }
+
+    function renderGlossary(){
+      const wrap = document.getElementById('gList');
+      wrap.innerHTML='';
+      GLOSSARY.forEach(item=>{
+        const div=document.createElement('div');
+        div.className='gItem';
+        div.innerHTML = '<div class="en">'+escapeHtml(item.en)+'</div>'+
+                        '<div class="ar">'+escapeHtml(item.ar)+'</div>'+
+                        '<div class="ex">'+escapeHtml(item.ex||'')+'</div>';
+        wrap.appendChild(div);
+      });
+    }
+
+    function filterGlossary(){
+      const q = (document.getElementById('gq').value||'').toLowerCase();
+      document.querySelectorAll('#gList .gItem').forEach(it=>{
+        it.style.display = it.innerText.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    function toggleGlossary(){
+      const box = document.getElementById('glossary');
+      box.style.display = (box.style.display==='block') ? 'none' : 'block';
+    }
+
+    applyMmLinks();
+    renderGlossary();
+  </script>
+</body>
+</html>
